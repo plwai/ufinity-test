@@ -1,0 +1,27 @@
+{
+  "name": "ufinity-test",
+  "version": "0.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node server.js",
+    "dev": "cross-env NODE_ENV=local nodemon server.js",
+    "test": "jest --coverage"
+  },
+  "repository": "https://github.com/plwai/ufinity-test",
+  "dependencies": {
+    "express": "^4.16.4",
+    "helmet": "^3.14.0",
+    "mysql": "^2.16.0"
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.0",
+    "eslint": "^5.7.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-prettier": "^3.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-prettier": "^3.0.0",
+    "jest": "^23.6.0",
+    "nodemon": "^1.18.5",
+    "prettier": "^1.14.3"
+  }
+}
