@@ -2,17 +2,21 @@ const mysql = require('mysql');
 const dbConfig = require('./config/db-config');
 
 const createDB = `create database if not exists ${
-  dbConfig.database === undefined ? 'ufinity' : dbConfig.database
+  dbConfig.database === undefined ? 'ufinityplwai' : dbConfig.database
 }`;
 
 const createTable = {
   createTeacher: `create table if not exists teacher(
     teacherId int PRIMARY KEY auto_increment,
-    email VARCHAR(255)not null)`,
+    email VARCHAR(255)not null,
+    UNIQUE (email)
+  )`,
   createStudent: `create table if not exists student(
     studentId int PRIMARY KEY auto_increment,
     email VARCHAR(255)not null,
-    isSuspended bit not null DEFAULT 1)`,
+    isSuspended bit not null DEFAULT 0,
+    UNIQUE (email)
+  )`,
   createTeacherClass: `create table if not exists teacherClass(
     classId int PRIMARY KEY auto_increment,
     teacherId int,
@@ -39,7 +43,9 @@ const seedDb = () =>
 
     // Use db
     seedConnection.query(
-      `use ${dbConfig.database === undefined ? 'ufinity' : dbConfig.database}`,
+      `use ${
+        dbConfig.database === undefined ? 'ufinityplwai' : dbConfig.database
+      }`,
       (queryErr, _result, _field) => {
         if (queryErr) {
           throw new Error(queryErr);

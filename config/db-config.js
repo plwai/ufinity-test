@@ -23,7 +23,7 @@ if (mode === 'local') {
 }
 
 if (isSeed !== 'yes') {
-  connectionConfig.database = 'ufinity';
+  connectionConfig.database = 'ufinityplwai';
 }
 
 module.exports = connectionConfig;
