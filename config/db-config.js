@@ -1,26 +1,29 @@
-const port = process.env.NODE_ENV;
+const mode = process.env.NODE_ENV;
+const isSeed = process.env.SEED_ENV;
 let connectionConfig;
 
-if (port === 3000) {
+if (mode === 'local') {
   // Development mode
   connectionConfig = {
     host: 'localhost',
-    port: 3001,
+    port: 3306,
     user: 'root',
-    password: '',
-    database: 'ufinity-dev',
+    password: '123456789',
     insecureAuth: true,
   };
 } else {
   // Production mode
   connectionConfig = {
     host: 'localhost',
-    port: 5001,
+    port: 3306,
     user: 'root',
-    password: '',
-    database: 'ufinity-release',
+    password: '123456789',
     insecureAuth: true,
   };
+}
+
+if (isSeed !== 'yes') {
+  connectionConfig.database = 'ufinity';
 }
 
 module.exports = connectionConfig;
