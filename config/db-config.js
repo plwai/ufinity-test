@@ -8,7 +8,7 @@ if (mode === 'local') {
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: '123456789',
+    password: '',
     insecureAuth: true,
   };
 } else {
@@ -17,7 +17,7 @@ if (mode === 'local') {
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: '123456789',
+    password: '',
     insecureAuth: true,
   };
 }
