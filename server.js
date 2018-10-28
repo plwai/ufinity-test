@@ -1,5 +1,5 @@
 const express = require('express');
-const adminRouter = require('./src/router/api/administrative');
+const adminRouter = require('./src/router/api/admin.api');
 const serverConfig = require('./config/server-config')(process.env.NODE_ENV);
 
 const app = express();
