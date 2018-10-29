@@ -9,7 +9,7 @@ class Database {
     return new Promise((resolve, _reject) => {
       this.connection.connect(err => {
         if (err) {
-          console.error(`error: ${err.message}`);
+          throw new Error(`error: ${err.message}`);
         }
 
         resolve();
@@ -21,7 +21,6 @@ class Database {
     return new Promise((resolve, _reject) => {
       this.connection.query(sql, args, (err, rows) => {
         if (err) {
-          console.log(sql);
           throw new Error(err);
         }
 
