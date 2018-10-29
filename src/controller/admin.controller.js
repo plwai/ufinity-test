@@ -2,15 +2,9 @@ const teacherModel = require('../model/teacher.model');
 const studentModel = require('../model/student.model');
 const teacherClassModel = require('../model/teacherClass.model');
 
-const exampleRequest = {
-  teacher: 'teacherken@gmail.com',
-  students: ['studentjon@example.com', 'studenthon@example.com'],
-};
-
 const adminController = {
   registerStudent: async (req, res) => {
-    // const requestJson = req.body;
-    const requestJson = exampleRequest;
+    const requestJson = req.body;
 
     // Check fields
     if (
@@ -38,21 +32,28 @@ const adminController = {
       }
 
       // Add student and link into class
-      requestJson.students.forEach(async student => {
-        let studentId;
-        let selectedStudent = await studentModel.getStudent(student);
+      const promisesContainer = requestJson.students.map(
+        student =>
+          new Promise(async (resolve, _reject) => {
+            let studentId;
+            let selectedStudent = await studentModel.getStudent(student);
 
-        if (selectedStudent.length === 0) {
-          selectedStudent = await studentModel.registerStudent(student);
+            if (selectedStudent.length === 0) {
+              selectedStudent = await studentModel.registerStudent(student);
 
-          studentId = selectedStudent.insertId;
-        } else {
-          const [first] = selectedStudent;
-          ({ studentId } = first);
-        }
+              studentId = selectedStudent.insertId;
+            } else {
+              const [first] = selectedStudent;
+              ({ studentId } = first);
+            }
 
-        await teacherClassModel.addTeacherClassMember(teacherId, studentId);
-      });
+            await teacherClassModel.addTeacherClassMember(teacherId, studentId);
+
+            resolve();
+          })
+      );
+
+      await Promise.all(promisesContainer);
     } catch (err) {
       res.send('Error');
       return;
@@ -61,7 +62,7 @@ const adminController = {
     res
       .header('Content-Type', 'application/json')
       .status(204)
-      .send(exampleRequest);
+      .send();
   },
 };
 

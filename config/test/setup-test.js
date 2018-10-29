@@ -1,8 +1,15 @@
-const Database = require('./src/model/database.model');
-const dbConfig = require('./config/db-config');
+const Database = require('../../src/model/database.model');
+
+const dbConfig = {
+  host: 'localhost',
+  port: 3306,
+  user: 'root',
+  password: '',
+  insecureAuth: true,
+};
 
 const createDB = `create database if not exists ${
-  dbConfig.database === undefined ? 'ufinityplwai' : dbConfig.database
+  dbConfig.database === undefined ? 'ufinityplwaitest' : dbConfig.database
 }`;
 
 const createTable = {
@@ -28,20 +35,19 @@ const createTable = {
 
 const seedDb = db =>
   new Promise(async (resolve, _reject) => {
-    await db.connect();
     await db.query(createDB);
-    await db.query(
-      `use ${
-        dbConfig.database === undefined ? 'ufinityplwai' : dbConfig.database
-      }`
-    );
+    await db.query('use ufinityplwaitest');
     await db.query(createTable.createTeacher);
     await db.query(createTable.createStudent);
     await db.query(createTable.createTeacherClass);
-    await db.close();
 
     resolve();
   });
 
-const db = new Database(dbConfig);
-seedDb(db);
+module.exports = async () => {
+  const db = new Database(dbConfig);
+
+  await db.connect();
+  await seedDb(db);
+  await db.close();
+};

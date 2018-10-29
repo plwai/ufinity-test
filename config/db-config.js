@@ -11,6 +11,15 @@ if (mode === 'local') {
     password: '',
     insecureAuth: true,
   };
+} else if (mode === 'test') {
+  connectionConfig = {
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    password: '',
+    insecureAuth: true,
+    database: 'ufinityplwaitest',
+  };
 } else {
   // Production mode
   connectionConfig = {
@@ -22,7 +31,7 @@ if (mode === 'local') {
   };
 }
 
-if (isSeed !== 'yes') {
+if (isSeed !== 'yes' && mode !== 'test') {
   connectionConfig.database = 'ufinityplwai';
 }
 

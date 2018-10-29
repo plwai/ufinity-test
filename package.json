@@ -7,7 +7,7 @@
     "dev": "cross-env NODE_ENV=local nodemon server.js",
     "seedLocal": "cross-env NODE_ENV=local cross-env SEED_ENV=yes node seed.js",
     "seedProduction": "cross-env NODE_ENV=production cross-env SEED_ENV=yes node seed.js",
-    "test": "jest --coverage"
+    "test": "cross-env NODE_ENV=test jest --coverage"
   },
   "repository": "https://github.com/plwai/ufinity-test",
   "dependencies": {
@@ -16,12 +16,20 @@
     "helmet": "^3.14.0",
     "mysql": "^2.16.0"
   },
+  "jest": {
+    "globalSetup": "./config/test/setup-test.js",
+    "globalTeardown": "./config/test/teardown-test.js",
+    "collectCoverageFrom": [
+      "src/**/*.{js}"
+    ]
+  },
   "devDependencies": {
     "cross-env": "^5.2.0",
     "eslint": "^5.7.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-config-prettier": "^3.1.0",
     "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jest": "^21.26.2",
     "eslint-plugin-prettier": "^3.0.0",
     "jest": "^23.6.0",
     "nodemon": "^1.18.5",

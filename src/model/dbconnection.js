@@ -1,12 +1,7 @@
-const mysql = require('mysql');
 const dbConfig = require('../../config/db-config');
+const Database = require('./database.model');
 
-const connection = mysql.createConnection(dbConfig);
+const db = new Database(dbConfig);
+db.connect();
 
-connection.connect(err => {
-  if (err) {
-    console.error(`error: ${err.message}`);
-  }
-});
-
-module.exports = connection;
+module.exports = db;

@@ -5,19 +5,7 @@ const TeacherClass = {
     const params = [];
     params.push(teacherId);
 
-    return new Promise((resolve, _reject) => {
-      db.query(
-        'SELECT * FROM teacherclass WHERE teacherId=?',
-        params,
-        (err, _result, _field) => {
-          if (err) {
-            throw new Error(err);
-          }
-
-          resolve(_result);
-        }
-      );
-    });
+    return db.query('SELECT * FROM teacherclass WHERE teacherId=?', params);
   },
   addTeacherClassMember: async (teacherId, studentId) => {
     const params = [];
@@ -36,19 +24,10 @@ const TeacherClass = {
       return Promise.resolve();
     }
 
-    return new Promise((resolve, _reject) => {
-      db.query(
-        'INSERT INTO teacherclass (teacherId, studentId) VALUES(?, ?)',
-        params,
-        (err, _result, _field) => {
-          if (err) {
-            throw new Error(err);
-          }
-
-          resolve(_result);
-        }
-      );
-    });
+    return db.query(
+      'INSERT INTO teacherclass (teacherId, studentId) VALUES(?, ?)',
+      params
+    );
   },
 };
 
