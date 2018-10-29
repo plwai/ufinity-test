@@ -1,15 +1,14 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const adminRouter = require('./src/router/api/admin.api');
 const serverConfig = require('./config/server-config')(process.env.NODE_ENV);
 
 const app = express();
-const router = express.Router();
 const { port, mode } = serverConfig;
 
-router.get('/', (req, res, next) => {
-  res.send('home page');
-});
-
-app.use('/', router);
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use('/api', adminRouter);
 
 app.listen(port, () => {
   console.log(`Listening on port ${port} with mode ${mode}`);
