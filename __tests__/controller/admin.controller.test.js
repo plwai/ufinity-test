@@ -72,11 +72,9 @@ test('Undefine registration should send error ', async () => {
 
   // Check response
   expect(send.mock.calls).toHaveLength(1);
-  expect(send.mock.calls[0][0]).toBe('Error');
-});
-
-afterAll(async () => {
-  await db.close();
+  expect(send.mock.calls[0][0]).toStrictEqual({
+    message: 'Request data unknown',
+  });
 });
 
 test('Get common student with multiple query and data exists in db', async () => {
@@ -212,4 +210,81 @@ test('Get common student with data NOT exists in db', async () => {
   });
 
   expect(status.mock.calls).toHaveLength(0);
+});
+
+test('Suspend student', async () => {
+  // Construct init data
+  let body = {
+    teacher: 'teacherken@suspend.com',
+    students: ['studenttest@suspend.com'],
+  };
+
+  const send = jest.fn(chainFunction);
+  const header = jest.fn(chainFunction);
+  const status = jest.fn(chainFunction);
+
+  let res = { header, status, send };
+  let req = { body };
+
+  await adminController.registerStudent(req, res);
+
+  body = {};
+  body.student = 'studenttest@suspend.com';
+
+  res = { header, status, send };
+  req = { body };
+
+  await adminController.suspendsStudent(req, res);
+
+  // Check response
+  expect(send.mock.calls).toHaveLength(2);
+
+  expect(header.mock.calls).toHaveLength(2);
+  expect(header.mock.calls[1][0]).toBe('Content-Type', 'application/json');
+
+  expect(status.mock.calls).toHaveLength(2);
+  expect(status.mock.calls[1][0]).toBe(204);
+});
+
+test('Suspend student no student', async () => {
+  const body = {};
+  body.student = 'studenttest@suspendNoStudent.com';
+
+  const send = jest.fn(chainFunction);
+  const header = jest.fn(chainFunction);
+  const status = jest.fn(chainFunction);
+
+  const res = { header, status, send };
+  const req = { body };
+
+  await adminController.suspendsStudent(req, res);
+
+  // Check response
+  expect(send.mock.calls).toHaveLength(1);
+  expect(send.mock.calls[0][0]).toStrictEqual({
+    message: 'Student does not exists',
+  });
+});
+
+test('Suspend student request unknown', async () => {
+  const body = {};
+
+  const send = jest.fn(chainFunction);
+  const header = jest.fn(chainFunction);
+  const status = jest.fn(chainFunction);
+
+  const res = { header, status, send };
+  const req = { body };
+
+  await adminController.suspendsStudent(req, res);
+
+  // Check response
+  expect(send.mock.calls).toHaveLength(1);
+  expect(send.mock.calls[0][0]).toStrictEqual({
+    message: 'Request data unknown',
+  });
+});
+
+afterAll(async () => {
+  await db.close();
 });

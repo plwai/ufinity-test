@@ -2,6 +2,14 @@ const teacherModel = require('../model/teacher.model');
 const studentModel = require('../model/student.model');
 const teacherClassModel = require('../model/teacherClass.model');
 
+const verifyJsonData = (...args) => {
+  args.forEach(arg => {
+    if (arg === undefined) {
+      throw new Error('Request data unknown');
+    }
+  });
+};
+
 const createErrorJson = err => {
   const errorJson = { message: err.message };
   return errorJson;
@@ -9,26 +17,18 @@ const createErrorJson = err => {
 
 const adminController = {
   registerStudent: async (req, res) => {
-    const requestJson = req.body;
-
-    // Check fields
-    if (
-      requestJson.teacher === undefined ||
-      requestJson.students === undefined
-    ) {
-      res.send('Error');
-      return;
-    }
+    const { teacher, students } = req.body;
 
     try {
+      // Check fields
+      verifyJsonData(teacher, students);
+
       // Get teacher
-      let selectedTeacher = await teacherModel.getTeacher(requestJson.teacher);
+      let selectedTeacher = await teacherModel.getTeacher(teacher);
       let teacherId;
 
       if (selectedTeacher.length === 0) {
-        selectedTeacher = await teacherModel.registerTeacher(
-          requestJson.teacher
-        );
+        selectedTeacher = await teacherModel.registerTeacher(teacher);
 
         teacherId = selectedTeacher.insertId;
       } else {
@@ -37,7 +37,7 @@ const adminController = {
       }
 
       // Add student and link into class
-      const promisesContainer = requestJson.students.map(
+      const registerPromises = students.map(
         student =>
           new Promise(async (resolve, _reject) => {
             let studentId;
@@ -58,16 +58,15 @@ const adminController = {
           })
       );
 
-      await Promise.all(promisesContainer);
+      await Promise.all(registerPromises);
+
+      res
+        .header('Content-Type', 'application/json')
+        .status(204)
+        .send();
     } catch (err) {
       res.send(createErrorJson(err));
-      return;
     }
-
-    res
-      .header('Content-Type', 'application/json')
-      .status(204)
-      .send();
   },
   getCommonStudent: async (req, res) => {
     let teacherArr = req.query.teacher;
@@ -103,6 +102,30 @@ const adminController = {
         .header('Content-Type', 'application/json')
         .status(200)
         .send(resJSON);
+    } catch (err) {
+      res.send(createErrorJson(err));
+    }
+  },
+  suspendsStudent: async (req, res) => {
+    const { student } = req.body;
+
+    try {
+      // Check if data correct
+      verifyJsonData(student);
+
+      const { affectedRows } = await studentModel.changeSuspendStatus(
+        student,
+        true
+      );
+
+      if (affectedRows === 0) {
+        throw new Error('Student does not exists');
+      }
+
+      res
+        .header('Content-Type', 'application/json')
+        .status(204)
+        .send();
     } catch (err) {
       res.send(createErrorJson(err));
     }
