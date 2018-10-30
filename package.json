@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=production node server.js",
+    "start": "cross-env NODE_ENV=local node server.js",
     "dev": "cross-env NODE_ENV=local nodemon server.js",
     "seedLocal": "cross-env NODE_ENV=local cross-env SEED_ENV=yes node seed.js",
     "seedProduction": "cross-env NODE_ENV=production cross-env SEED_ENV=yes node seed.js",
