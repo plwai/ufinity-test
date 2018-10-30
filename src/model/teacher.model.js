@@ -1,7 +1,6 @@
 const db = require('./dbconnection');
 
 const Teacher = {
-  getAllTeacher: () => {},
   getTeacher: email => {
     const params = [];
     params.push(email);
