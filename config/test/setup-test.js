@@ -8,23 +8,23 @@ const dbConfig = {
   insecureAuth: true,
 };
 
-const createDB = `create database if not exists ${
+const createDB = `CREATE DATABASE if not exists ${
   dbConfig.database === undefined ? 'ufinityplwaitest' : dbConfig.database
 }`;
 
 const createTable = {
-  createTeacher: `create table if not exists teacher(
+  createTeacher: `CREATE TABLE if not exists teacher(
     teacherId int PRIMARY KEY auto_increment,
     email VARCHAR(255)not null,
     UNIQUE (email)
   )`,
-  createStudent: `create table if not exists student(
+  createStudent: `CREATE TABLE if not exists student(
     studentId int PRIMARY KEY auto_increment,
     email VARCHAR(255)not null,
     isSuspended tinyint not null DEFAULT 0,
     UNIQUE (email)
   )`,
-  createTeacherClass: `create table if not exists teacherClass(
+  createTeacherClass: `CREATE TABLE if not exists teacherclass(
     classId int PRIMARY KEY auto_increment,
     teacherId int,
     studentId int,
