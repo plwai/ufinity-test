@@ -285,6 +285,198 @@ test('Suspend student request unknown', async () => {
   });
 });
 
+test('Receive notification with tag and without suspend', async () => {
+  // Construct init data
+  let body = {
+    teacher: 'teacherken@notification.com',
+    students: [
+      'studentunderteacher@notification.com',
+      'student2underteacher@notification.com',
+    ],
+  };
+
+  const send = jest.fn(chainFunction);
+  const header = jest.fn(chainFunction);
+  const status = jest.fn(chainFunction);
+
+  let res = { header, status, send };
+  let req = { body };
+
+  await adminController.registerStudent(req, res);
+
+  body = {
+    teacher: 'teacherken2@notification.com',
+    students: [
+      'studentnotteacher@notification.com',
+      'student2notteacher@notification.com',
+    ],
+  };
+
+  res = { header, status, send };
+  req = { body };
+
+  await adminController.registerStudent(req, res);
+
+  body = {
+    teacher: 'teacherken@notification.com',
+    notification:
+      'Hello students! @studentnotteacher@notification.com @student2underteacher@notification.com',
+  };
+
+  res = { header, status, send };
+  req = { body };
+
+  await adminController.receiveNotification(req, res);
+
+  const expectedValue = {
+    recipients: [
+      'studentnotteacher@notification.com',
+      'student2underteacher@notification.com',
+      'studentunderteacher@notification.com',
+    ],
+  };
+
+  expect(header.mock.calls).toHaveLength(3);
+  expect(header.mock.calls[2][0]).toBe('Content-Type', 'application/json');
+
+  expect(status.mock.calls).toHaveLength(3);
+  expect(status.mock.calls[2][0]).toBe(200);
+
+  expect(send.mock.calls).toHaveLength(3);
+  expect(send.mock.calls[2][0]).toStrictEqual(expectedValue);
+});
+
+test('Receive notification without tag and without suspend', async () => {
+  // Construct init data
+  let body = {
+    teacher: 'teacherken@notificationnotag.com',
+    students: [
+      'studentunderteacher@notificationnotag.com',
+      'student2underteacher@notificationnotag.com',
+    ],
+  };
+
+  const send = jest.fn(chainFunction);
+  const header = jest.fn(chainFunction);
+  const status = jest.fn(chainFunction);
+
+  let res = { header, status, send };
+  let req = { body };
+
+  await adminController.registerStudent(req, res);
+
+  body = {
+    teacher: 'teacherken2@notificationnotag.com',
+    students: [
+      'studentnotteacher@notificationnotag.com',
+      'student2notteacher@notificationnotag.com',
+    ],
+  };
+
+  res = { header, status, send };
+  req = { body };
+
+  await adminController.registerStudent(req, res);
+
+  body = {
+    teacher: 'teacherken@notificationnotag.com',
+    notification: 'Hello students!',
+  };
+
+  res = { header, status, send };
+  req = { body };
+
+  await adminController.receiveNotification(req, res);
+
+  const expectedValue = {
+    recipients: [
+      'studentunderteacher@notificationnotag.com',
+      'student2underteacher@notificationnotag.com',
+    ],
+  };
+
+  expect(header.mock.calls).toHaveLength(3);
+  expect(header.mock.calls[2][0]).toBe('Content-Type', 'application/json');
+
+  expect(status.mock.calls).toHaveLength(3);
+  expect(status.mock.calls[2][0]).toBe(200);
+
+  expect(send.mock.calls).toHaveLength(3);
+  expect(send.mock.calls[2][0]).toStrictEqual(expectedValue);
+});
+
+test('Receive notification with tag and with suspend', async () => {
+  // Construct init data
+  let body = {
+    teacher: 'teacherken@notificationsuspend.com',
+    students: [
+      'studentunderteacher@notificationsuspend.com',
+      'student2underteacher@notificationsuspend.com',
+    ],
+  };
+
+  const send = jest.fn(chainFunction);
+  const header = jest.fn(chainFunction);
+  const status = jest.fn(chainFunction);
+
+  let res = { header, status, send };
+  let req = { body };
+
+  await adminController.registerStudent(req, res);
+
+  body = {
+    teacher: 'teacherken2@notificationsuspend.com',
+    students: [
+      'studentnotteacher@notificationsuspend.com',
+      'student2notteacher@notificationsuspend.com',
+    ],
+  };
+
+  res = { header, status, send };
+  req = { body };
+
+  await adminController.registerStudent(req, res);
+
+  body = {};
+  body.student = 'student2notteacher@notificationsuspend.com';
+
+  res = { header, status, send };
+  req = { body };
+
+  await adminController.suspendsStudent(req, res);
+
+  body = {};
+  body.student = 'student2underteacher@notificationsuspend.com';
+
+  res = { header, status, send };
+  req = { body };
+
+  await adminController.suspendsStudent(req, res);
+
+  body = {
+    teacher: 'teacherken@notificationsuspend.com',
+    notification: 'Hello students! @student2notteacher@notificationsuspend.com',
+  };
+
+  res = { header, status, send };
+  req = { body };
+
+  await adminController.receiveNotification(req, res);
+
+  const expectedValue = {
+    recipients: ['studentunderteacher@notificationsuspend.com'],
+  };
+
+  expect(header.mock.calls).toHaveLength(5);
+  expect(header.mock.calls[4][0]).toBe('Content-Type', 'application/json');
+
+  expect(status.mock.calls).toHaveLength(5);
+  expect(status.mock.calls[4][0]).toBe(200);
+
+  expect(send.mock.calls).toHaveLength(5);
+  expect(send.mock.calls[4][0]).toStrictEqual(expectedValue);
+});
+
 afterAll(async () => {
   await db.close();
 });
