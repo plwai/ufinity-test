@@ -5,4 +5,6 @@ router.post('/register', adminController.registerStudent);
 
 router.get('/commonstudents', adminController.getCommonStudent);
 
+router.post('/suspend', adminController.suspendsStudent);
+
 module.exports = router;
