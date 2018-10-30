@@ -20,7 +20,8 @@
     "globalSetup": "./config/test/setup-test.js",
     "globalTeardown": "./config/test/teardown-test.js",
     "collectCoverageFrom": [
-      "src/**/*.{js}"
+      "src/**/*.{js}",
+      "!src/router/**/*.{js}"
     ]
   },
   "devDependencies": {

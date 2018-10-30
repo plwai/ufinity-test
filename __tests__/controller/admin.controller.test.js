@@ -78,3 +78,138 @@ test('Undefine registration should send error ', async () => {
 afterAll(async () => {
   await db.close();
 });
+
+test('Get common student with multiple query and data exists in db', async () => {
+  // Construct init data
+  let body = {
+    teacher: 'teacherken@commontest.com',
+    students: [
+      'studentjon@commontest.com',
+      'studenthon@commontest.com',
+      'studentlaw@commontest.com',
+    ],
+  };
+
+  const send = jest.fn(chainFunction);
+  const header = jest.fn(chainFunction);
+  const status = jest.fn(chainFunction);
+
+  let res = { header, status, send };
+  let req = { body };
+
+  await adminController.registerStudent(req, res);
+
+  body = {
+    teacher: 'teacherhon@commontest.com',
+    students: [
+      'studentken@commontest.com',
+      'studenthon@commontest.com',
+      'studentlaw@commontest.com',
+    ],
+  };
+
+  req = { body };
+
+  await adminController.registerStudent(req, res);
+
+  const query = {};
+
+  query.teacher = ['teacherken@commontest.com', 'teacherhon@commontest.com'];
+
+  res = { header, status, send };
+  req = { query };
+
+  await adminController.getCommonStudent(req, res);
+
+  const expectedValue = {};
+  expectedValue.students = [
+    'studenthon@commontest.com',
+    'studentlaw@commontest.com',
+  ];
+
+  // Check response
+  expect(send.mock.calls).toHaveLength(3);
+  expect(send.mock.calls[2][0]).toStrictEqual(expectedValue);
+
+  expect(status.mock.calls).toHaveLength(3);
+  expect(status.mock.calls[2][0]).toBe(200);
+});
+
+test('Get common student with single query and data exists in db', async () => {
+  // Construct init data
+  let body = {
+    teacher: 'teacherken@commonsingletest.com',
+    students: [
+      'studentjon@commonsingletest.com',
+      'studenthon@commonsingletest.com',
+      'studentlaw@commonsingletest.com',
+    ],
+  };
+
+  const send = jest.fn(chainFunction);
+  const header = jest.fn(chainFunction);
+  const status = jest.fn(chainFunction);
+
+  let res = { header, status, send };
+  let req = { body };
+
+  await adminController.registerStudent(req, res);
+
+  body = {
+    teacher: 'teacherhon@commonsingletest.com',
+    students: [
+      'studentken@commonsingletest.com',
+      'studenthon@commonsingletest.com',
+      'studentlaw@commonsingletest.com',
+    ],
+  };
+
+  req = { body };
+
+  await adminController.registerStudent(req, res);
+
+  const query = {};
+
+  query.teacher = 'teacherken@commonsingletest.com';
+
+  res = { header, status, send };
+  req = { query };
+
+  await adminController.getCommonStudent(req, res);
+
+  const expectedValue = {};
+  expectedValue.students = [
+    'studentjon@commonsingletest.com',
+    'studenthon@commonsingletest.com',
+    'studentlaw@commonsingletest.com',
+  ];
+
+  // Check response
+  expect(send.mock.calls).toHaveLength(3);
+  expect(send.mock.calls[2][0]).toStrictEqual(expectedValue);
+
+  expect(status.mock.calls).toHaveLength(3);
+  expect(status.mock.calls[2][0]).toBe(200);
+});
+
+test('Get common student with data NOT exists in db', async () => {
+  const send = jest.fn(chainFunction);
+  const status = jest.fn(chainFunction);
+
+  const query = {};
+
+  query.teacher = 'teacherken@commonsinglenottest.com';
+
+  const res = { status, send };
+  const req = { query };
+
+  await adminController.getCommonStudent(req, res);
+
+  // Check response
+  expect(send.mock.calls).toHaveLength(1);
+  expect(send.mock.calls[0][0]).toStrictEqual({
+    message: 'Teacher does not exist',
+  });
+
+  expect(status.mock.calls).toHaveLength(0);
+});
