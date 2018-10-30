@@ -21,7 +21,7 @@ const createTable = {
   createStudent: `create table if not exists student(
     studentId int PRIMARY KEY auto_increment,
     email VARCHAR(255)not null,
-    isSuspended bit not null DEFAULT 0,
+    isSuspended tinyint not null DEFAULT 0,
     UNIQUE (email)
   )`,
   createTeacherClass: `create table if not exists teacherClass(
