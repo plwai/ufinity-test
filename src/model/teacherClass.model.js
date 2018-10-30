@@ -2,11 +2,22 @@ const db = require('./dbconnection');
 const teacherModel = require('./teacher.model');
 
 const TeacherClass = {
-  getTeacherClassMember: async teacherId => {
+  getTeacherClassMemberById: async teacherId => {
     const params = [];
     params.push(teacherId);
 
     return db.query('SELECT * FROM teacherclass WHERE teacherId=?', params);
+  },
+  getTeacherClassMember: async email => {
+    const [teacher] = await teacherModel.getTeacher(email);
+
+    if (teacher === undefined) {
+      return Promise.resolve();
+    }
+
+    const { teacherId } = teacher;
+
+    return TeacherClass.getTeacherClassMemberById(teacherId);
   },
   getCommonTeacher: async teacherEmails => {
     const params = [];
@@ -39,7 +50,7 @@ const TeacherClass = {
     params.push(studentId);
 
     // Check if duplicate teacher and student
-    const classMember = await TeacherClass.getTeacherClassMember(teacherId);
+    const classMember = await TeacherClass.getTeacherClassMemberById(teacherId);
 
     const isExisted = classMember.find(
       member => member.studentId === studentId
