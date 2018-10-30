@@ -7,4 +7,6 @@ router.get('/commonstudents', adminController.getCommonStudent);
 
 router.post('/suspend', adminController.suspendsStudent);
 
+router.post('/retrievefornotifications', adminController.receiveNotification);
+
 module.exports = router;

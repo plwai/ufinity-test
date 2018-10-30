@@ -10,6 +10,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/api', adminRouter);
 
+// 404 Error
+app.use((_req, res, _next) => {
+  res.status(404).send('404 Not Found');
+});
+
 app.listen(port, () => {
+  // eslint-disable-next-line no-console
   console.log(`Listening on port ${port} with mode ${mode}`);
 });

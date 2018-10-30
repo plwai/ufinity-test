@@ -130,6 +130,75 @@ const adminController = {
       res.send(createErrorJson(err));
     }
   },
+  receiveNotification: async (req, res) => {
+    const { teacher, notification } = req.body;
+
+    try {
+      // Check request data
+      verifyJsonData(teacher, notification);
+
+      // Parse notification
+      const tagRegex = /(@[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+\b)/;
+      let tags = tagRegex.exec(notification);
+
+      const tagEmails = [];
+
+      while (tags !== null) {
+        tagEmails.push(tags[0].substring(1));
+        tags = tagRegex.exec(tags.input.substring(tags.index + 1));
+      }
+
+      // Get student status for tags
+      const tagPromises = tagEmails.map(
+        email =>
+          new Promise(async (resolve, _reject) => {
+            const [student] = await studentModel.getStudent(email);
+
+            resolve(student);
+          })
+      );
+
+      const teacherMembers = await teacherClassModel.getTeacherClassMember(
+        teacher
+      );
+
+      // Get student status for students under the teacher
+      const teacherMemberPromises = teacherMembers.map(
+        teacherMember =>
+          new Promise(async (resolve, _reject) => {
+            const { studentId } = teacherMember;
+            const [student] = await studentModel.getStudentById(studentId);
+
+            resolve(student);
+          })
+      );
+
+      const combinedPromises = [...tagPromises, ...teacherMemberPromises];
+
+      let studentsData = await Promise.all(combinedPromises);
+
+      studentsData = [...studentsData.filter(student => !student.isSuspended)];
+
+      let studentEmails = studentsData.map(student => student.email);
+
+      // Remove duplicated email
+      studentEmails = [
+        ...studentEmails.filter(
+          (email, index, arr) => arr.indexOf(email) === index
+        ),
+      ];
+
+      const responseJson = {};
+      responseJson.recipients = studentEmails;
+
+      res
+        .header('Content-Type', 'application/json')
+        .status(200)
+        .send(responseJson);
+    } catch (err) {
+      res.send(createErrorJson(err));
+    }
+  },
 };
 
 module.exports = adminController;
