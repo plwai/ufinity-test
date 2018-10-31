@@ -10,12 +10,6 @@
     "test": "cross-env NODE_ENV=test jest --coverage"
   },
   "repository": "https://github.com/plwai/ufinity-test",
-  "dependencies": {
-    "body-parser": "^1.18.3",
-    "express": "^4.16.4",
-    "helmet": "^3.14.0",
-    "mysql": "^2.16.0"
-  },
   "jest": {
     "globalSetup": "./config/test/setup-test.js",
     "globalTeardown": "./config/test/teardown-test.js",
@@ -23,6 +17,12 @@
       "src/**/*.{js}",
       "!src/router/**/*.{js}"
     ]
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "helmet": "^3.14.0",
+    "mysql": "^2.16.0"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
