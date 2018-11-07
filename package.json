@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "body-parser": "^1.18.3",
+    "email-validator": "^2.0.4",
     "express": "^4.16.4",
     "helmet": "^3.14.0",
     "make-runnable": "^1.3.6",

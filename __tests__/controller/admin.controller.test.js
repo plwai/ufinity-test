@@ -77,6 +77,43 @@ test('Undefine registration should send error ', async () => {
   });
 });
 
+test('Invalid registration data should send error', async () => {
+  // Invalid teacher
+  const body = {
+    teacher: 'teachergmail.com',
+    students: ['studentjon@example.com', 'studenthon@example.com'],
+  };
+
+  const send = jest.fn(chainFunction);
+  const header = jest.fn(chainFunction);
+  const status = jest.fn(chainFunction);
+
+  const res = { header, status, send };
+  const req = { body };
+
+  await adminController.registerStudent(req, res);
+
+  // Check response
+  expect(send.mock.calls).toHaveLength(1);
+  expect(send.mock.calls[0][0]).toStrictEqual({
+    message: 'teachergmail.com is invalid',
+  });
+
+  // Invalid student
+  req.body = {
+    teacher: 'teacherken@gmail.com',
+    students: ['studentjoe.com', 'studenthon@example.com'],
+  };
+
+  await adminController.registerStudent(req, res);
+
+  // Check response
+  expect(send.mock.calls).toHaveLength(2);
+  expect(send.mock.calls[1][0]).toStrictEqual({
+    message: 'studentjoe.com is invalid',
+  });
+});
+
 test('Get common student with multiple query and data exists in db', async () => {
   // Construct init data
   let body = {
@@ -212,6 +249,28 @@ test('Get common student with data NOT exists in db', async () => {
   expect(status.mock.calls).toHaveLength(0);
 });
 
+test('Get common student with invalid data', async () => {
+  const send = jest.fn(chainFunction);
+  const status = jest.fn(chainFunction);
+
+  const query = {};
+
+  query.teacher = 'teachernsinglenottest.com';
+
+  const res = { status, send };
+  const req = { query };
+
+  await adminController.getCommonStudent(req, res);
+
+  // Check response
+  expect(send.mock.calls).toHaveLength(1);
+  expect(send.mock.calls[0][0]).toStrictEqual({
+    message: 'teachernsinglenottest.com is invalid',
+  });
+
+  expect(status.mock.calls).toHaveLength(0);
+});
+
 test('Suspend student', async () => {
   // Construct init data
   let body = {
@@ -282,6 +341,26 @@ test('Suspend student request unknown', async () => {
   expect(send.mock.calls).toHaveLength(1);
   expect(send.mock.calls[0][0]).toStrictEqual({
     message: 'Request data unknown',
+  });
+});
+
+test('Suspend student invalid data', async () => {
+  const body = {};
+  body.student = 'studenttendNoStudent.com';
+
+  const send = jest.fn(chainFunction);
+  const header = jest.fn(chainFunction);
+  const status = jest.fn(chainFunction);
+
+  const res = { header, status, send };
+  const req = { body };
+
+  await adminController.suspendsStudent(req, res);
+
+  // Check response
+  expect(send.mock.calls).toHaveLength(1);
+  expect(send.mock.calls[0][0]).toStrictEqual({
+    message: 'studenttendNoStudent.com is invalid',
   });
 });
 
@@ -475,6 +554,40 @@ test('Receive notification with tag and with suspend', async () => {
 
   expect(send.mock.calls).toHaveLength(5);
   expect(send.mock.calls[4][0]).toStrictEqual(expectedValue);
+});
+
+test('Receive notification with invalid data', async () => {
+  // Construct init data
+  const body = {
+    teacher: 'teacherke.com',
+    notification: 'Hello students! @student2notteacher@notificationsuspend.com',
+  };
+
+  const send = jest.fn(chainFunction);
+  const header = jest.fn(chainFunction);
+  const status = jest.fn(chainFunction);
+
+  const res = { header, status, send };
+  const req = { body };
+
+  await adminController.receiveNotification(req, res);
+
+  expect(send.mock.calls).toHaveLength(1);
+  expect(send.mock.calls[0][0]).toStrictEqual({
+    message: 'teacherke.com is invalid',
+  });
+
+  req.body = {
+    teacher: 'teacherken@notificationsuspend.com',
+    notification: 1,
+  };
+
+  await adminController.receiveNotification(req, res);
+
+  expect(send.mock.calls).toHaveLength(2);
+  expect(send.mock.calls[1][0]).toStrictEqual({
+    message: `${req.body.notification} is invalid`,
+  });
 });
 
 afterAll(async () => {
