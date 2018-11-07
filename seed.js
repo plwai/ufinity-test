@@ -1,9 +1,9 @@
 const Database = require('./src/model/database.model');
 const dbConfig = require('./config/db-config');
 
-const createDB = `CREATE DATABASE if not exists ${
-  dbConfig.database === undefined ? 'ufinityplwai' : dbConfig.database
-}`;
+const databaseName = dbConfig.database;
+
+const createDB = `CREATE DATABASE if not exists ${databaseName}`;
 
 const createTable = {
   createTeacher: `CREATE TABLE if not exists teacher(
@@ -30,11 +30,7 @@ const seedDb = db =>
   new Promise(async (resolve, _reject) => {
     await db.connect();
     await db.query(createDB);
-    await db.query(
-      `use ${
-        dbConfig.database === undefined ? 'ufinityplwai' : dbConfig.database
-      }`
-    );
+    await db.query(`use ${databaseName}`);
     await db.query(createTable.createTeacher);
     await db.query(createTable.createStudent);
     await db.query(createTable.createTeacherClass);
@@ -43,5 +39,15 @@ const seedDb = db =>
     resolve();
   });
 
-const db = new Database(dbConfig);
-seedDb(db);
+module.exports.initDb = async () => {
+  // Remove connection database name
+  dbConfig.database = undefined;
+
+  const db = new Database(dbConfig);
+  await seedDb(db);
+
+  // Revert database name
+  dbConfig.database = databaseName;
+};
+
+require('make-runnable');
