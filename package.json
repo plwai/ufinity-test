@@ -5,8 +5,9 @@
   "scripts": {
     "start": "cross-env NODE_ENV=local node server.js",
     "dev": "cross-env NODE_ENV=local nodemon server.js",
-    "seedLocal": "cross-env NODE_ENV=local cross-env node seed.js initDb",
-    "seedProduction": "cross-env NODE_ENV=production cross-env node seed.js",
+    "debug-dev": "cross-env NODE_ENV=local DEBUG_ENV=debug nodemon server.js",
+    "seedLocal": "cross-env NODE_ENV=local cross-env SEED_ENV=yes node seed.js initDb",
+    "seedProduction": "cross-env NODE_ENV=production cross-env SEED_ENV=yes node seed.js",
     "test": "cross-env NODE_ENV=test jest --coverage"
   },
   "repository": "https://github.com/plwai/ufinity-test",
@@ -22,9 +23,12 @@
     "body-parser": "^1.18.3",
     "email-validator": "^2.0.4",
     "express": "^4.16.4",
+    "express-winston": "^3.0.1",
+    "fs": "^0.0.1-security",
     "helmet": "^3.14.0",
     "make-runnable": "^1.3.6",
-    "mysql": "^2.16.0"
+    "mysql": "^2.16.0",
+    "winston": "^3.1.0"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
