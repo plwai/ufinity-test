@@ -1,3 +1,5 @@
+const emailValidator = require('email-validator');
+
 const teacherModel = require('../model/teacher.model');
 const studentModel = require('../model/student.model');
 const teacherClassModel = require('../model/teacherClass.model');
@@ -20,8 +22,20 @@ const adminController = {
     const { teacher, students } = req.body;
 
     try {
-      // Check fields
+      // Check undefined fields
       verifyJsonData(teacher, students);
+
+      // Check teacher data format
+      if (!emailValidator.validate(teacher)) {
+        throw new Error(`${teacher} is invalid`);
+      }
+
+      // Check student data format
+      students.forEach(student => {
+        if (!emailValidator.validate(student)) {
+          throw new Error(`${student} is invalid`);
+        }
+      });
 
       // Get teacher
       let selectedTeacher = await teacherModel.getTeacher(teacher);
@@ -71,12 +85,23 @@ const adminController = {
   getCommonStudent: async (req, res) => {
     let teacherArr = req.query.teacher;
 
-    // Check if only single teacher query
-    if (!(teacherArr instanceof Array)) {
-      teacherArr = [teacherArr];
-    }
-
     try {
+      // Check undefined field
+      if (teacherArr === undefined) {
+        throw new Error('data is undefined');
+      }
+
+      // Check if only single teacher query
+      if (!(teacherArr instanceof Array)) {
+        teacherArr = [teacherArr];
+      }
+
+      teacherArr.forEach(teacher => {
+        if (!emailValidator.validate(teacher)) {
+          throw new Error(`${teacher} is invalid`);
+        }
+      });
+
       // Get common students id
       const commonTeacherMember = await teacherClassModel.getCommonTeacher(
         teacherArr
@@ -110,8 +135,13 @@ const adminController = {
     const { student } = req.body;
 
     try {
-      // Check if data correct
+      // Check if data exists
       verifyJsonData(student);
+
+      // Check email format
+      if (!emailValidator.validate(student)) {
+        throw new Error(`${student} is invalid`);
+      }
 
       const { affectedRows } = await studentModel.changeSuspendStatus(
         student,
@@ -134,8 +164,21 @@ const adminController = {
     const { teacher, notification } = req.body;
 
     try {
-      // Check request data
+      // Check request data exists
       verifyJsonData(teacher, notification);
+
+      // Check teacher email
+      if (!emailValidator.validate(teacher)) {
+        throw new Error(`${teacher} is invalid`);
+      }
+
+      // Check notification
+      if (
+        typeof notification !== 'string' &&
+        !(notification instanceof String)
+      ) {
+        throw new Error(`${notification} is invalid`);
+      }
 
       // Parse notification
       const tagRegex = /(@[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+\b)/;
