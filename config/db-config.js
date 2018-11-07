@@ -1,5 +1,4 @@
 const mode = process.env.NODE_ENV;
-const isSeed = process.env.SEED_ENV;
 let connectionConfig;
 
 if (mode === 'local') {
@@ -10,8 +9,10 @@ if (mode === 'local') {
     user: 'root',
     password: '',
     insecureAuth: true,
+    database: 'ufinityplwai',
   };
 } else if (mode === 'test') {
+  // Test mode
   connectionConfig = {
     host: 'localhost',
     port: 3306,
@@ -29,10 +30,6 @@ if (mode === 'local') {
     password: '',
     insecureAuth: true,
   };
-}
-
-if (isSeed !== 'yes' && mode !== 'test') {
-  connectionConfig.database = 'ufinityplwai';
 }
 
 module.exports = connectionConfig;

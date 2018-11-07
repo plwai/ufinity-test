@@ -1,14 +1,7 @@
 const Database = require('../../src/model/database.model');
+const dbConfig = require('../../config/db-config');
 
-const dbConfig = {
-  host: 'localhost',
-  port: 3306,
-  user: 'root',
-  password: '',
-  insecureAuth: true,
-};
-
-const dropDBQuery = 'DROP DATABASE ufinityplwaitest';
+const dropDBQuery = `DROP DATABASE ${dbConfig.database}`;
 
 const dropDB = () =>
   new Promise(async (resolve, _reject) => {
