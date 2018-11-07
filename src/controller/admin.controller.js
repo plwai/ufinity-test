@@ -1,20 +1,20 @@
 const emailValidator = require('email-validator');
 
+const logger = require('../logger/logger');
+
 const teacherModel = require('../model/teacher.model');
 const studentModel = require('../model/student.model');
 const teacherClassModel = require('../model/teacherClass.model');
 
+const { createErrorJson } = require('../utility/json-builder');
+const WarnError = require('../utility/error-utility');
+
 const verifyJsonData = (...args) => {
   args.forEach(arg => {
     if (arg === undefined) {
-      throw new Error('Request data unknown');
+      throw new WarnError('Request data unknown');
     }
   });
-};
-
-const createErrorJson = err => {
-  const errorJson = { message: err.message };
-  return errorJson;
 };
 
 const adminController = {
@@ -27,13 +27,13 @@ const adminController = {
 
       // Check teacher data format
       if (!emailValidator.validate(teacher)) {
-        throw new Error(`${teacher} is invalid`);
+        throw new WarnError(`${teacher} is invalid`);
       }
 
       // Check student data format
       students.forEach(student => {
         if (!emailValidator.validate(student)) {
-          throw new Error(`${student} is invalid`);
+          throw new WarnError(`${student} is invalid`);
         }
       });
 
@@ -78,7 +78,15 @@ const adminController = {
         .header('Content-Type', 'application/json')
         .status(204)
         .send();
+
+      logger.info(`Successfully added ${students} for ${teacher}`);
     } catch (err) {
+      if (err instanceof WarnError) {
+        logger.warn(err.message);
+      } else {
+        logger.error(err.message);
+      }
+
       res.send(createErrorJson(err));
     }
   },
@@ -88,7 +96,7 @@ const adminController = {
     try {
       // Check undefined field
       if (teacherArr === undefined) {
-        throw new Error('data is undefined');
+        throw new WarnError('data is undefined');
       }
 
       // Check if only single teacher query
@@ -98,7 +106,7 @@ const adminController = {
 
       teacherArr.forEach(teacher => {
         if (!emailValidator.validate(teacher)) {
-          throw new Error(`${teacher} is invalid`);
+          throw new WarnError(`${teacher} is invalid`);
         }
       });
 
@@ -108,7 +116,7 @@ const adminController = {
       );
 
       if (commonTeacherMember === undefined) {
-        throw new Error('Teacher does not exist');
+        throw new WarnError('Teacher does not exist');
       }
 
       // Translate id into student model
@@ -128,6 +136,12 @@ const adminController = {
         .status(200)
         .send(resJSON);
     } catch (err) {
+      if (err instanceof WarnError) {
+        logger.warn(err.message);
+      } else {
+        logger.error(err.message);
+      }
+
       res.send(createErrorJson(err));
     }
   },
@@ -140,7 +154,7 @@ const adminController = {
 
       // Check email format
       if (!emailValidator.validate(student)) {
-        throw new Error(`${student} is invalid`);
+        throw new WarnError(`${student} is invalid`);
       }
 
       const { affectedRows } = await studentModel.changeSuspendStatus(
@@ -149,14 +163,22 @@ const adminController = {
       );
 
       if (affectedRows === 0) {
-        throw new Error('Student does not exists');
+        throw new WarnError('Student does not exists');
       }
 
       res
         .header('Content-Type', 'application/json')
         .status(204)
         .send();
+
+      logger.info(`Successfully suspend ${student}`);
     } catch (err) {
+      if (err instanceof WarnError) {
+        logger.warn(err.message);
+      } else {
+        logger.error(err.message);
+      }
+
       res.send(createErrorJson(err));
     }
   },
@@ -169,7 +191,7 @@ const adminController = {
 
       // Check teacher email
       if (!emailValidator.validate(teacher)) {
-        throw new Error(`${teacher} is invalid`);
+        throw new WarnError(`${teacher} is invalid`);
       }
 
       // Check notification
@@ -177,7 +199,7 @@ const adminController = {
         typeof notification !== 'string' &&
         !(notification instanceof String)
       ) {
-        throw new Error(`${notification} is invalid`);
+        throw new WarnError(`${notification} is invalid`);
       }
 
       // Parse notification
@@ -239,6 +261,12 @@ const adminController = {
         .status(200)
         .send(responseJson);
     } catch (err) {
+      if (err instanceof WarnError) {
+        logger.warn(err.message);
+      } else {
+        logger.error(err.message);
+      }
+
       res.send(createErrorJson(err));
     }
   },
